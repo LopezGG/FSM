@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSM", "FSM\FSM.csproj", "{F5625231-20B1-4378-9421-557F5BF1730C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessInput", "ProcessInput\ProcessInput.csproj", "{1E801547-BA71-4DBA-9579-3D02F8FF5B4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F5625231-20B1-4378-9421-557F5BF1730C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5625231-20B1-4378-9421-557F5BF1730C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5625231-20B1-4378-9421-557F5BF1730C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E801547-BA71-4DBA-9579-3D02F8FF5B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E801547-BA71-4DBA-9579-3D02F8FF5B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E801547-BA71-4DBA-9579-3D02F8FF5B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E801547-BA71-4DBA-9579-3D02F8FF5B4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

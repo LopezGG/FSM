@@ -16,6 +16,7 @@ namespace FSM
             List<String> FinalStates = new List<string>();
             String lexiconPath;
             String FSAPath;
+            String WordList_path="";
             if (args.Length > 1)
             {
                 lexiconPath = args[1];
@@ -35,10 +36,42 @@ namespace FSM
             Dictionary<String, List<String>> lexicon = GetLexicon(lexiconPath);
 
             DataTable TransitionTableUpd = MergeLexiconTransition(TransitionTable, lexicon);
-            foreach (DataRow row in TransitionTableUpd.Rows)
+
+            using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(@"output_fsm"))
             {
-                Console.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " \"" + row["Replace"].ToString() + "\"))");
+                file.WriteLine(FinalStates[0]);
+                foreach (DataRow row in TransitionTableUpd.Rows)
+                {
+                    string term = row["Term"].ToString();
+                    string replace = row["Replace"].ToString();
+                    if (replace != "*e*")
+                        replace = String.Format("\"" + replace + "\"");
+                    if (!String.IsNullOrEmpty(term) && term != "*e*")
+                        term = String.Format("\"" + term + "\"");
+
+                    if (!String.IsNullOrEmpty(term))
+                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " " + replace + " " + term+ "))");
+                    else
+                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " " + replace + " *e*))");
+                }
             }
+            using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(@"output_fsm2"))
+            {
+                file.WriteLine(FinalStates[0]);
+                foreach (DataRow row in TransitionTableUpd.Rows)
+                {
+                    if (!String.IsNullOrEmpty(row["Term"].ToString()))
+                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " \"" + row["Replace"].ToString() +  "\"))");
+                    else
+                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " \"" + row["Replace"].ToString() + "\"))");
+                }
+            }
+
+
+
+
             ////Print lexicon
             //foreach (KeyValuePair<String,List<String>> item in lexicon)
             //{
@@ -87,7 +120,7 @@ namespace FSM
 				        }
 				        else
 				        {
-					        string fromState = line.Substring(1, line.IndexOf(' '));
+					        string fromState = line.Substring(1, line.IndexOf(' ')-1);
 					        if (counter ==1)
 					        {
 						        Start = fromState;
@@ -139,13 +172,27 @@ namespace FSM
             foreach (DataRow row in TransitionTable.Rows)
             {
                 term = row["Term"].ToString();
-
+                string from = row["From"].ToString();
+                string to = row["To"].ToString();
                 if (lexicon.ContainsKey(term))
                 {
                     List<String> Stringlist = lexicon[term];
-                    foreach (var item in Stringlist)
+                    foreach (string item in Stringlist)
                     {
-                        TransitionTableUpd.Rows.Add(row["From"], row["To"], term, item.ToString(), row["Weight"]);
+                        for (int i = 0; i < item.Length; i++)
+                        {
+                            string fnew = String.Format(from + "_" + (i - 1));
+                            string tnew = String.Format(from + "_" + i);
+                            string ModTerm = String.Format(item + "/" + term);
+                            if (item.Length == 1)
+                                TransitionTableUpd.Rows.Add(from, to, ModTerm, item[i], row["Weight"]);
+                            else if (i == item.Length -1 )
+                                TransitionTableUpd.Rows.Add(fnew, to, ModTerm, item[i], row["Weight"]);
+                            else if (i == 0)
+                                TransitionTableUpd.Rows.Add(from, tnew, "", item[i], row["Weight"]);
+                            else
+                                TransitionTableUpd.Rows.Add(fnew, tnew, "", item[i], row["Weight"]);
+                        }
                     }
                 }
                 else if (term == "*e*")

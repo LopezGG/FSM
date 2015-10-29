@@ -15,59 +15,67 @@ namespace FSM
 
             List<String> FinalStates = new List<string>();
             String lexiconPath;
-            String FSAPath;
-            String WordList_path="";
-            if (args.Length > 1)
+            String MorphRulesPath;
+            String output_path="";
+            Boolean FirstQuestion = true;
+            if (args.Length == 4)
             {
-                lexiconPath = args[1];
-                FSAPath = args[0];
+                lexiconPath = args[0];
+                MorphRulesPath = args[1];
+                output_path = args[2];
+                FirstQuestion = Convert.ToBoolean(args[3]);
             }
             else if (args.Length == 1)
             {
-                lexiconPath = FSAPath = args[0];
+                lexiconPath = MorphRulesPath = args[0];
             }
             else
             {
-                lexiconPath = @"C:\compling570\HW4\ex";
-                FSAPath = @"C:\compling570\HW4\morph_rules_ex";
+                lexiconPath = @"C:\Users\gilopez\Documents\GitHub\FSM\lexicon_ex";
+                MorphRulesPath = @"C:\Users\gilopez\Documents\GitHub\FSM\morph_rules_ex";
+                output_path = @"C:\Users\gilopez\Documents\GitHub\FSM\Output_fsm_ex"; 
             }
             String Start = "";
-            DataTable TransitionTable = GetTable(FinalStates, FSAPath, out Start);
+            DataTable TransitionTable = GetTable(FinalStates, MorphRulesPath, out Start);
             Dictionary<String, List<String>> lexicon = GetLexicon(lexiconPath);
 
             DataTable TransitionTableUpd = MergeLexiconTransition(TransitionTable, lexicon);
-
-            using (System.IO.StreamWriter file =
-                new System.IO.StreamWriter(@"output_fsm"))
+            if (!FirstQuestion)
             {
-                file.WriteLine(FinalStates[0]);
-                foreach (DataRow row in TransitionTableUpd.Rows)
+                using (System.IO.StreamWriter file =
+                        new System.IO.StreamWriter(output_path))
                 {
-                    string term = row["Term"].ToString();
-                    string replace = row["Replace"].ToString();
-                    if (replace != "*e*")
-                        replace = String.Format("\"" + replace + "\"");
-                    if (!String.IsNullOrEmpty(term) && term != "*e*")
-                        term = String.Format("\"" + term + "\"");
+                    file.WriteLine(FinalStates[0]);
+                    foreach (DataRow row in TransitionTableUpd.Rows)
+                    {
+                        string term = row["Term"].ToString();
+                        string replace = row["Replace"].ToString();
+                        if (replace != "*e*")
+                            replace = String.Format("\"" + replace + "\"");
 
-                    if (!String.IsNullOrEmpty(term))
-                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " " + replace + " " + term+ "))");
-                    else
-                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " " + replace + " *e*))");
+                        if (!String.IsNullOrEmpty(term))
+                            file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " " + replace + " " + term + "))");
+                        else
+                            file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " " + replace + " *e*))");
+                    }
                 }
             }
-            using (System.IO.StreamWriter file =
-                new System.IO.StreamWriter(@"output_fsm2"))
+            else // Question1 doesnot need a replacement
             {
-                file.WriteLine(FinalStates[0]);
-                foreach (DataRow row in TransitionTableUpd.Rows)
+                using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(output_path))
                 {
-                    if (!String.IsNullOrEmpty(row["Term"].ToString()))
-                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " \"" + row["Replace"].ToString() +  "\"))");
-                    else
-                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " \"" + row["Replace"].ToString() + "\"))");
+                    file.WriteLine(FinalStates[0]);
+                    foreach (DataRow row in TransitionTableUpd.Rows)
+                    {
+                        string replace = row["Replace"].ToString();
+                        if (replace != "*e*")
+                            replace = String.Format("\"" + replace + "\"");
+                        file.WriteLine('(' + row["From"].ToString() + " (" + row["To"].ToString() + " " + replace + "))");
+                    }
                 }
             }
+
 
 
 
@@ -80,9 +88,6 @@ namespace FSM
             //    Console.WriteLine();
             //    Console.WriteLine();
             //}
-
-
-            Console.ReadLine();
         }
 
 
@@ -210,7 +215,7 @@ namespace FSM
             String value;
             Dictionary<String, List<String>> lexicon = new Dictionary<String, List<String>>();
             String line;
-            using (StreamReader reader = new StreamReader(@"C:\compling570\HW4\lexicon_ex"))
+            using (StreamReader reader = new StreamReader(PathToLexicon))
             {
                 while ((line = reader.ReadLine()) != null)
                 {
